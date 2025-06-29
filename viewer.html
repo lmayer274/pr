@@ -1,18 +1,32 @@
 <div id="viewer" style="width: 100%; height: 500px;"></div>
+
+<!-- Three.js core -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.min.js"></script>
+
+<!-- Loaders -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.140.0/examples/js/loaders/MTLLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.140.0/examples/js/loaders/OBJLoader.js"></script>
 
+<!-- OrbitControls -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.140.0/examples/js/controls/OrbitControls.js"></script>
+
 <script>
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-  const renderer = new THREE.WebGLRenderer({antialias: true});
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, 500);
   document.getElementById('viewer').appendChild(renderer.domElement);
 
-  scene.add(new THREE.AmbientLight(0xffffff));
-  camera.position.z = 5;
+  scene.add(new THREE.AmbientLight(0xffffff, 1));
+  camera.position.set(0, 0, 5);
 
+  // Enable OrbitControls
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.1;
+  controls.rotateSpeed = 0.5;
+
+  // Load model
   const mtlLoader = new THREE.MTLLoader();
   mtlLoader.setPath('https://lmayer274.github.io/pr/');
   mtlLoader.load('rhino.mtl', (materials) => {
@@ -21,7 +35,7 @@
     objLoader.setMaterials(materials);
     objLoader.setPath('https://lmayer274.github.io/pr/');
     objLoader.load('rhino.obj', (object) => {
-      object.scale.set(0.5, 0.5, 0.5); // Optional: scale if it's too large
+      object.scale.set(0.5, 0.5, 0.5); // Adjust as needed
       scene.add(object);
       animate();
     });
@@ -29,6 +43,7 @@
 
   function animate() {
     requestAnimationFrame(animate);
+    controls.update(); // <-- Important!
     renderer.render(scene, camera);
   }
 </script>
