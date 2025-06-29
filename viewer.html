@@ -12,21 +12,28 @@
 
 <script>
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  scene.background = new THREE.Color(0xffffff); // White background
+
+  const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+
+  camera.position.set(0, 0, 1); // Zoomed in
+
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, 500);
   document.getElementById('viewer').appendChild(renderer.domElement);
 
   scene.add(new THREE.AmbientLight(0xffffff, 1));
-  camera.position.set(0, 0, 5);
 
-  // Enable OrbitControls
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.1;
   controls.rotateSpeed = 0.5;
 
-  // Load model
   const mtlLoader = new THREE.MTLLoader();
   mtlLoader.setPath('https://lmayer274.github.io/pr/');
   mtlLoader.load('rhino.mtl', (materials) => {
@@ -35,7 +42,11 @@
     objLoader.setMaterials(materials);
     objLoader.setPath('https://lmayer274.github.io/pr/');
     objLoader.load('rhino.obj', (object) => {
-      object.scale.set(0.5, 0.5, 0.5); // Adjust as needed
+      object.scale.set(0.5, 0.5, 0.5); // Resize if needed
+
+      // Rotate 90° left around Y-axis
+      object.rotation.y = Math.PI / 2;
+
       scene.add(object);
       animate();
     });
@@ -43,7 +54,7 @@
 
   function animate() {
     requestAnimationFrame(animate);
-    controls.update(); // <-- Important!
+    controls.update();
     renderer.render(scene, camera);
   }
 </script>
